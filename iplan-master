@@ -1,0 +1,75 @@
+#!groovy
+
+// imports
+import jenkins.model.Jenkins
+import hudson.model.*
+
+import org.kohsuke.github.*
+import static groovy.io.FileType.FILES
+
+def owner = 'jenkinsci'
+def project = 'pipeline-examples'
+def repos = ["${owner}/${project}"]
+def builders = [:]
+
+// get Jenkins instance
+Jenkins jenkins = Jenkins.getInstance()
+
+// variables
+def viewName = 'MyView'
+
+// create the new view
+jenkins.addView(new ListView(viewName))
+
+// get the view
+myView = hudson.model.Hudson.instance.getView(viewName)
+
+
+for (x in repos) {
+    def repo = x
+    pipelineJob("${owner}-${project}") {
+      definition {
+          cpsScm {
+              scm {
+                  git {
+                      remote {
+                          github(repo,'ssh')
+                          credentials('git')
+                      }
+                      branch('*/master')
+                  }
+              }
+              triggers {
+        		scm('* * * * *')
+              }
+//              steps {
+	          scriptPath('declarative-examples/simple-examples/environmentInStage.groovy')            
+//           	  }
+          }
+      }
+    }
+}
+
+
+
+println "${owner}-${project}"
+def thejob = "${owner}-${project}"
+myView.doAddJobToView(thejob)  
+// save current Jenkins state to disk
+jenkins.save()
+
+
+//def project = 'jenkinsci/pipeline-examples'
+//def branchApi = new URL("https://api.github.com/repos/${project}/branches")
+//def jobs = new groovy.json.JsonSlurper().parse(branchApi.newReader())
+//branches.each {
+//    def branchName = it.name
+//    def jobName = "${project}-${branchName}".replaceAll('/','-')
+//    job(jobName) {
+//        scm {
+//            git("git://github.com/${project}.git", branchName)
+//        }
+//        steps {
+//            maven("test -Dproject.name=${project}/${branchName}")
+//        }
+//    }
