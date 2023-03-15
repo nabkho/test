@@ -7,7 +7,6 @@ node {
     if (env.BRANCH_NAME == 'main') {
       stage('Process Job DSLs') {
         jobDsl(
-          additionalClasspath: 'build/classes/main',
           failOnMissingPlugin: true,
           removedJobAction: 'DISABLE',
           removedViewAction: 'DELETE',
