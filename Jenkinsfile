@@ -4,7 +4,7 @@ node {
 //    stage('Validate Jobs') {
 //      sh './gradlew build'
 //    }
-    if (env.BRANCH_NAME == 'master') {
+    if (env.BRANCH_NAME == 'main') {
       stage('Process Job DSLs') {
         jobDsl(
           additionalClasspath: 'build/classes/main',
